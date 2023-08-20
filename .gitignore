@@ -1,0 +1,8 @@
+.vscode/
+build/
+sdkconfig*
+.devcontainer/devcontainer.json
+.devcontainer/Dockerfile
+debug.log
+managed_components/*
+dependencies.lock

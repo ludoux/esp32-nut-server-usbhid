@@ -1,0 +1,16 @@
+menu "Example Configuration"
+
+    config EXAMPLE_TCP_SERVER_BIND_ADDRESS
+        string "Server bind address"
+        default "0.0.0.0"
+        help
+            Server listener's socket would be bound to this address. This address could be
+            either IPv4 or IPv6 address
+
+    config EXAMPLE_TCP_SERVER_BIND_PORT
+        string "Server bind port"
+        default "3493"
+        help
+            Server listener's socket would be bound to this port.
+
+endmenu

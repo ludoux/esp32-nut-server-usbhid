@@ -761,6 +761,7 @@ void refresh_ups_status_from_hid(bool *beep)
     }
     got_item = cJSON_GetObjectItemCaseSensitive(json_object, "battery");
     got_item = cJSON_GetObjectItemCaseSensitive(got_item, "charger");
+    got_item = cJSON_GetObjectItemCaseSensitive(got_item, "status");
     cJSON_SetValuestring(got_item, setted_text);
 
     itoa(battery_runtime, setted_text, 10);

@@ -72,7 +72,7 @@ static const char *hid_proto_name_str[] = {
 
 // =tcp server
 
-static char *ori_json = "{\"battery\":{\"charge\":{\"_root\":\"100\",\"low\":\"20\"},\"charger\":{\"status\":\"charging\"},\"runtime\":\"1104\",\"type\":\"PbAc\"},\"device\":{\"mfr\":\"EATON\",\"model\":\"SANTAK TG-BOX 850\",\"serial\":\"Blank\",\"type\":\"ups\"},\"driver\":{\"name\":\"usbhid-ups\",\"parameter\":{\"pollfreq\":30,\"pollinterval\":2,\"port\":\"/dev/ttyS1\",\"synchronous\":\"no\"},\"version\":{\"_root\":\"2.7.4\",\"data\":\"MGE HID 1.39\",\"internal\":\"0.41\"}},\"input\":{\"transfer\":{\"high\":\"264\",\"low\":\"184\"}},\"outlet\":{\"1\":{\"desc\":\"PowerShare Outlet 1\",\"id\":\"1\",\"status\":\"on\",\"switchable\":\"no\"},\"desc\":\"Main Outlet\",\"id\":\"0\",\"switchable\":\"yes\"},\"output\":{\"frequency\":{\"nominal\":\"50\"},\"voltage\":{\"_root\":\"230.0\",\"nominal\":\"220\"}},\"ups\":{\"beeper\":{\"status\":\"enabled\"},\"delay\":{\"shutdown\":\"20\",\"start\":\"30\"},\"firmware\":\"02.08.0010\",\"load\":\"28\",\"mfr\":\"EATON\",\"model\":\"SANTAK TG-BOX 850\",\"power\":{\"nominal\":\"850\"},\"productid\":\"ffff\",\"serial\":\"Blank\",\"status\":\"OFF\",\"timer\":{\"shutdown\":\"0\",\"start\":\"0\"},\"type\":\"offline / line interactive\",\"vendorid\":\"0463\"}}";
+static char *ori_json = "{\"battery\":{\"charge\":{\"_root\":\"100\",\"low\":\"20\"},\"charger\":{\"status\":\"charging\"},\"runtime\":\"1104\",\"type\":\"PbAc\"},\"device\":{\"mfr\":\"EATON\",\"model\":\"SANTAK TG-BOX 850\",\"serial\":\"Blank\",\"type\":\"ups\"},\"driver\":{\"name\":\"usbhid-ups\",\"parameter\":{\"pollfreq\":30,\"pollinterval\":2,\"port\":\"/dev/ttyS1\",\"synchronous\":\"no\"},\"version\":{\"_root\":\"2.7.4\",\"data\":\"MGE HID 1.39\",\"internal\":\"0.41\"}},\"input\":{\"transfer\":{\"high\":\"264\",\"low\":\"184\"}},\"outlet\":{\"1\":{\"desc\":\"PowerShare Outlet 1\",\"id\":\"1\",\"status\":\"on\",\"switchable\":\"no\"},\"desc\":\"Main Outlet\",\"id\":\"0\",\"switchable\":\"yes\"},\"output\":{\"frequency\":{\"nominal\":\"50\"},\"voltage\":{\"_root\":\"230.0\",\"nominal\":\"220\"}},\"ups\":{\"beeper\":{\"status\":\"enabled\"},\"delay\":{\"shutdown\":\"20\",\"start\":\"30\"},\"firmware\":\"02.08.0010\",\"load\":\"28\",\"mfr\":\"EATON\",\"model\":\"SANTAK TG-BOX 850\",\"power\":{\"nominal\":\"850\"},\"productid\":\"ffff\",\"serial\":\"Blank\",\"status\":\"OL\",\"timer\":{\"shutdown\":\"0\",\"start\":\"0\"},\"type\":\"offline / line interactive\",\"vendorid\":\"0463\"}}";
 cJSON *json_object;
 
 char nut_list_var_text[2048]="";
@@ -382,36 +382,40 @@ static void tcp_server_task(void *pvParameters)
                     char * rt;
                     char ok_text[4]="OK\n";
                     rt = ok_text;
-                    if (str_startswith(rx_buffer, "USERNAME") || str_startswith(rx_buffer, "PASSWORD") || str_startswith(rx_buffer, "LOGIN"))
+                    
+                    if (UPS_DEV_CONNECTED)
                     {
-                        // Safety Attention: will not check whether the user & password is correct.
-                        // Make sure your LAN environment is safe.
-                        rt = ok_text;
-                    }
-                    else if (str_startswith(rx_buffer, "LIST VAR"))
-                    {
-                        gen_nut_list_var_text_wrapper();
-                        rt = nut_list_var_text;
-                    }
-                    else if (str_startswith(rx_buffer, "GET VAR qnapups ups.status"))
-                    {
-                        cJSON *got_item;
-                        got_item = cJSON_GetObjectItemCaseSensitive(json_object, "ups");
-                        got_item = cJSON_GetObjectItemCaseSensitive(got_item, "status");
+                        if (str_startswith(rx_buffer, "USERNAME") || str_startswith(rx_buffer, "PASSWORD") || str_startswith(rx_buffer, "LOGIN"))
+                        {
+                            // Safety Attention: will not check whether the user & password is correct.
+                            // Make sure your LAN environment is safe.
+                            rt = ok_text;
+                        }
+                        else if (str_startswith(rx_buffer, "LIST VAR"))
+                        {
+                            gen_nut_list_var_text_wrapper();
+                            rt = nut_list_var_text;
+                        }
+                        else if (str_startswith(rx_buffer, "GET VAR qnapups ups.status"))
+                        {
+                            cJSON *got_item;
+                            got_item = cJSON_GetObjectItemCaseSensitive(json_object, "ups");
+                            got_item = cJSON_GetObjectItemCaseSensitive(got_item, "status");
 
-                        char tmp_rt[30];
-                        strcpy(tmp_rt, "VAR qnapups ups.status \"");
-                        strcat(tmp_rt, cJSON_GetStringValue(got_item));
-                        strcat(tmp_rt, "\"\n");
-                        rt = tmp_rt;
+                            char tmp_rt[30];
+                            strcpy(tmp_rt, "VAR qnapups ups.status \"");
+                            strcat(tmp_rt, cJSON_GetStringValue(got_item));
+                            strcat(tmp_rt, "\"\n");
+                            rt = tmp_rt;
+                        }
+                        else if (str_startswith(rx_buffer, "LOGOUT"))
+                        {
+                            char *bye_text = "OK Goodbye\n";
+                            rt = bye_text;
+                        }
                     }
-                    else if (str_startswith(rx_buffer, "LOGOUT"))
-                    {
-                        char *bye_text = "OK Goodbye\n";
-                        rt = bye_text;
-                    }
+
                     int to_write = strlen(rt);
-
                     len = socket_send(TAG, sock[i], rt, to_write);
                     if (len < 0) {
                         // Error occurred on write to this socket -> close it and mark invalid

@@ -1019,6 +1019,6 @@ void app_main(void)
     configure_led();
 
     // to receive queue sent from timer, and the actual thing is done at timer_task (for example, recheck ups status)
-    task_created = xTaskCreate(&timer_task, "timer_task", 4 * 1024, NULL, 2, NULL);
+    task_created = xTaskCreate(&timer_task, "timer_task", 4 * 1024, NULL, 8, NULL);
     assert(task_created == pdTRUE);
 }

@@ -1,9 +1,20 @@
 # ESP32-NUT-Server-USBHID
+A demo running on ESP32-S3 to communicate with USB-HID UPS and to be a tiny NUT (Network UPS Tools) Server.
+
 This is a simple project which contains a USB Host part to communicate with UPS as a HID Device, a protocol_examples_common to connect to specific Wi-Fi, a non-blocking TCP Server to response to work as a tiny NUT server, and a led_strip to control the RGB LED on board.
 
-The UPS HID communication protocol is hard-encode for [SANTAK TG-BOX 850](https://www.santak.com.cn/product/santak-tg-box-ups.html) (`driver.name: usbhid-ups; driver.version.data: MGE HID 1.32`). It may be uncapable with other UPS brands or models.
+The UPS HID communication protocol is hard-code for [SANTAK TG-BOX 850](https://www.santak.com.cn/product/santak-tg-box-ups.html) (`driver.name: usbhid-ups; driver.version.data: MGE HID 1.32`). It may be uncapable with other UPS brands or models.
 
-The NUT UPS name is set to be `qnapnas`. It will NOT check whether username or password is correct.
+Some UPS data is hard-code, such as model, serial, vendorid, and so on.
+
+The NUT UPS name is hard-code to be `qnapnas`. It will NOT check whether username or password is correct.
+
+Do not use it in production environment, thus it has not been tested and may be stability issues.
+
+## Video Demo
+[![video_demo](README.assets/video-pic.png)](https://www.bilibili.com/video/BV1YP411p75y/)
+
+or [https://www.bilibili.com/video/BV1YP411p75y/](https://www.bilibili.com/video/BV1YP411p75y/)
 
 ## Hardware Required
 * Development board with USB capable ESP SoC and a USB-OTG feature USB Port (or you can DIY a USB Type-A female port with extra 5V power supply). I'm using [源地 ESP32-S3 N16R8 dev board](https://github.com/vcc-gnd/YD-ESP32-S3/).

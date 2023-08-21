@@ -12,7 +12,7 @@ The NUT UPS name is hard-code to be `qnapnas`. It will NOT check whether usernam
 Do not use it in production environment, thus it has not been tested and may be stability issues.
 
 ## Video Demo
-[![video_demo](README.assets/video-pic.png)](https://www.bilibili.com/video/BV1YP411p75y/)
+[![video_demo](README.assets/video-pic.png)](https://youtu.be/Hl-p_l7d75I)
 
 or [https://www.bilibili.com/video/BV1YP411p75y/](https://www.bilibili.com/video/BV1YP411p75y/)
 

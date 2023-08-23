@@ -3,7 +3,7 @@ A demo running on ESP32-S3 to communicate with USB-HID UPS and to be a tiny NUT 
 
 This is a simple project which contains a USB Host part to communicate with UPS as a HID Device, a protocol_examples_common to connect to specific Wi-Fi, a non-blocking TCP Server to response to work as a tiny NUT server, and a led_strip to control the RGB LED on board.
 
-The UPS HID communication protocol is hard-code for [SANTAK TG-BOX 850](https://www.santak.com.cn/product/santak-tg-box-ups.html) (`driver.name: usbhid-ups; driver.version.data: MGE HID 1.32`). It may be uncapable with other UPS brands or models.
+The UPS HID communication protocol is hard-code for [SANTAK TG-BOX 850](https://www.santak.com.cn/product/santak-tg-box-ups.html) (`driver.name: usbhid-ups; driver.version.data: MGE HID 1.32`). It may be incompatible with other UPS brands or models.
 
 Some UPS data is hard-code, such as model, serial, vendorid, and so on.
 
@@ -150,7 +150,7 @@ You can follow the [USB HID Class example](https://github.com/espressif/esp-idf/
 I export the `hid_host_device_handle_t` (as `latest_hid_device_handle`) object in order to use `hid_class_request_get_report` more easily. (The best practice *may* need to gen a new handle for UPS?)
 
 ### UPS plug in & out
-When it plug in, `hid_host_device_event` will be triggered. When it plug out, `hid_host_interface_callback` will be triggered. So the `UPS_DEV_CONNECTED` falg is changed there. And my UPS hid protocol is none.
+When it plug in, `hid_host_device_event` will be triggered. When it plug out, `hid_host_interface_callback` will be triggered. So the `UPS_DEV_CONNECTED` flag is changed there. And my UPS hid protocol is none.
 
 ### Communicat with UPS
 a per-1-second timer is set to run `refresh_ups_status_from_hid` function if UPS is connected. In that function, `hid_class_request_get_report` will be used to gen specific protocol data according to the pre-analize and send to UPS, then get the report contained needed information. It will also update the cJSON object which should contains the latest UPS info and will be sent to NUT clients in TCP-Server part.
@@ -161,9 +161,9 @@ a per-1-second timer is set to run `refresh_ups_status_from_hid` function if UPS
 A gptimer is set to trigger at each second. When triggered, it will call `timer_on_alarm_callback`. As this function can not run any blocking functions, so it push an element to `timer_queue` (also `user_ctx` para). The running task `timer_task` created by `xTaskCreate` can receive this element and do actual things in it, such as `refresh_ups_status_from_hid`, change beep status if BOOT_BUTTON is pressed and so on.
 
 ## Part: LED Strip
-A simple way to show some status. The LED shows green if UPS connected, shows orange if UPS disconnected, shows red if UPS has error or AC not present, and shows white if a NUT client ask for data. Search `led_strip_set_pixel` in code file.
+A simple way to show some status. The LED shows green if UPS connected, shows orange if UPS disconnected, shows red if UPS has error or AC not present, and shows white if a NUT client ask for data. Search `led_strip_set_pixel` in the code file.
 
 ## Part: Non-blocking TCP Server
 This part is as a very simple NUT Server. It can only respond `USERNAME` `PASSWORD` `LOGIN` `LIST VAR` `GET VAR qnapups ups.status` and `LOGOUT` (in `tcp_server_task` func). It seems that a NUT client will only ask for these information on a regular basis.
 
-The UPS info is stored as cJSON object and will be updated at each `refresh_ups_status_from_hid` called. When a NUT client ask for info, it will print cJSON in a specific format (by calling `gen_nut_list_var_text_wrapper`) and return to client.
+The UPS info is stored as a cJSON object and will be updated at each `refresh_ups_status_from_hid` called. When a NUT client ask for info, it will print the cJSON object in a specific format (by calling `gen_nut_list_var_text_wrapper`) and return to the client.

@@ -11,7 +11,11 @@ The NUT UPS name is hard-code to be `qnapnas`. It will NOT check whether usernam
 
 Do not use it in production environment, thus it has not been tested and may be stability issues.
 
+**KNOWN ISSUES:** This little stuff can and will only try to connect to WiFi at booting stage. It will not re-connect to WiFi if it goes offline during the running phase, and you have to press the RST button or de-plug and re-plug the power cable mannually.
+
 ## Video Demo
+
+(Please ignore the typos on the cover lol)
 [![video_demo](README.assets/video-pic.png)](https://youtu.be/Hl-p_l7d75I)
 
 or [https://www.bilibili.com/video/BV1YP411p75y/](https://www.bilibili.com/video/BV1YP411p75y/)
